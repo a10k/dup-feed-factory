@@ -1,0 +1,23 @@
+{
+  "name": "dup-rss-feed-factory",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "^4.14.0",
+    "moment": "^2.14.1",
+    "rss": "^1.2.1",
+    "underscore": "^1.8.3",
+    "xml2js": "^0.4.17"
+  },
+  "engines": {
+    "node": "4.2.x",
+    "npm": "2.14.x"
+  },
+  "description": "Generates RSS Feeds from SNP XMl",
+  "main": "web.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alok Pepakayala",
+  "license": "ISC"
+}
