@@ -399,7 +399,7 @@ var processAndSendResponse = function(choosenFeed,numberOfDays,req,res){
     var feed = new RSS(feedoptions);
     ex.map(function(item){
       var varUrl = item.url;
-      varUrl = varUrl + '?id=us:2em:3na:dup:awa:' + choosenFeed;
+      varUrl = varUrl + '?id=us:2em:3pa:' + choosenFeed + ':eng:dup:' + moment().format('MMDDYY');
       item.url = varUrl;
       feed.item(item)
     })
