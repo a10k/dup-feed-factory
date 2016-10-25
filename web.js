@@ -71,6 +71,8 @@ Available fields for user:
 
 
 var listedSubTitles = {
+  //ALL for Interactive display (Joanie)
+  "all":"Recently published content",
   //Industries
   "consumer-business":"Consumer Business",
   "energy-resources":"Energy & Resources",
@@ -98,6 +100,8 @@ var listedSubTitles = {
   "talent":"Talent",
 }
 var listedSubs = {
+  //ALL for Interactive display (Joanie)
+  "Recently published content":[],
   //Industries
   "Consumer Business":['Consumer Loyalty',
             'Consumer Products',
@@ -271,7 +275,7 @@ var listedSubs = {
 
 var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,res) {
   //var xml = fs.readFileSync(__dirname + '/dup-us-en.xml', 'utf8');
-  request('http://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml', function (error, response, xml) {
+  request('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml', function (error, response, xml) {
     if (!error && response.statusCode == 200) {
       parser.parseString(xml, function(err, result) {
         var records = result.records.record;
@@ -291,7 +295,7 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
           var data = {
             'title' : item.title && item.title[0],
             'subTitle': item['sub-title'] && item['sub-title'][0],
-            'url': item['url'] && item['url'][0] && item['url'][0].replace('/content/dupress','http://dupress.deloitte.com'),
+            'url': item['url'] && item['url'][0] && item['url'][0].replace('/content/dupress','https://dupress.deloitte.com'),
             'description': item['desc'] && item['desc'][0],
             'guid': item['pageID'] && item['pageID'][0],
             'categories': item['cq-tag-name'] && item['cq-tag-name'][0] && item['cq-tag-name'][0].replace(/_us;en/g,'').split('|'),
@@ -300,7 +304,7 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
              custom_elements: [
                   {'type': item['content-type'] && item['content-type'][0]},
                   {'cta': item['cta'] && item['cta'][0]},
-                  {'thumbnail':item['thumbnail'] && item['thumbnail'][0] && ('http://dupress.deloitte.com' + item['thumbnail'][0]+'/jcr:content/renditions/cq5dam.web.120.120.jpeg')}
+                  {'thumbnail':item['thumbnail'] && item['thumbnail'][0] && ('https://dupress.deloitte.com' + item['thumbnail'][0]+'/jcr:content/renditions/cq5dam.web.120.120.jpeg')}
                 ]
             };
           processedRecords.push(data);
@@ -368,12 +372,15 @@ var processAndSendResponse = function(choosenFeed,numberOfDays,req,res){
     var listedTags = listedSubs[choosenFeedTitle];
     listedTags = listedTags.map(item=>item.toLowerCase().replace(/\s*\(.*?\)\s*/g,'').replace(/[, .]/g,'-').replace(/&/g,'and'));
     if(choosenFeed !== 'multimedia'){
-      ex = ex.filter(item=>{
-        var intersection = _.intersection(listedTags,item.categories);
-        if(intersection.length){
-          return true;
-        }
-      });
+      if(choosenFeed !== 'all'){
+        //Filter for normal feeds
+        ex = ex.filter(item=>{
+          var intersection = _.intersection(listedTags,item.categories);
+          if(intersection.length){
+            return true;
+          }
+        });
+      }
     }else{
       ex = ex.filter(item=>{
         var intersection = _.intersection(listedTags,[item.type.toLowerCase()]);
@@ -390,7 +397,7 @@ var processAndSendResponse = function(choosenFeed,numberOfDays,req,res){
         title: `Deloitte University Press: ${choosenFeedTitle}`,
         description: `Showing latest content for: ${choosenFeedTitle}`,
         feed_url: `http://dup-rss-feeds.herokuapp.com/${choosenFeed}/7/rss.xml`,
-        site_url: 'http://dupress.deloitte.com',
+        site_url: 'https://dupress.deloitte.com',
         copyright: 'Copyright © 2016 Deloitte Development LLC. All rights reserved.',
         language: 'en-us',
         generator:'DUP RSS FEED',
