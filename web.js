@@ -280,7 +280,7 @@ var listedSubs = {
 
 var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,res) {
   //var xml = fs.readFileSync(__dirname + '/dup-us-en.xml', 'utf8');
-  request('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml', function (error, response, xml) {
+  request('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml?nc=1', function (error, response, xml) {
     if (!error && response.statusCode == 200) {
       parser.parseString(xml, function(err, result) {
         var records = result.records.record;
@@ -338,7 +338,7 @@ app.get('/:feed/:days/rss.xml', function(req, res) {
   var numberOfDays = req.params.days;
   
   //DO WE PULL THE XML AGAIN?
-  if(global.lastUpdated < moment().subtract(15,'minute')){
+  if(global.lastUpdated < moment().subtract(1,'minute')){
     readXMLFile(processAndSendResponse,choosenFeed,numberOfDays,req,res);
     //^this function handles the response too
   }else{
@@ -354,7 +354,7 @@ var processAndSendResponse = function(choosenFeed,numberOfDays,req,res){
   //Filter date...
     var ex;
     ex = global.masterXml.filter((item) => {
-      if(item.date > moment().subtract(numberOfDays,"days")){
+      if(item.date >= moment().startOf('day').subtract(numberOfDays,"days")){
         return true;
       }
     });
