@@ -297,8 +297,23 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
 
         var processedRecords = [];
         records.map((item) => {
+          var prefixedTitle = '';
+          var normalTitle = (item.title && item.title[0]) || ''; 
+          normalTitle = normalTitle.replace('(Interactive) ','');
+          normalTitle = normalTitle.replace('(Infographic) ','');
+          normalTitle = normalTitle.replace('(Podcast) ','');
+          normalTitle = normalTitle.replace('(Video) ','');
+          
+          if (item['content-type'] == "Interactive" ||
+            item['content-type'] == "Infographic" ||
+            item['content-type'] == "Podcast" ||
+            item['content-type'] == "Video"
+          ){
+            prefixedTitle = '(' + item['content-type'] + ') ';
+          }
+          prefixedTitle = prefixedTitle + normalTitle;
           var data = {
-            'title' : item.title && item.title[0],
+            'title' : prefixedTitle,
             'subTitle': item['sub-title'] && item['sub-title'][0],
             'url': item['url'] && item['url'][0] && item['url'][0].replace('/content/dupress','https://dupress.deloitte.com'),
             'description': item['desc'] && item['desc'][0],
