@@ -28,7 +28,7 @@ app.use(express.static('public'));
 var global = {};
 // global.masterXml
  global.lastUpdated = new Date("1/1/1970");
-
+ global.AEMXMLSERVED = '';
 
 /*
 Available fields for user:
@@ -282,9 +282,10 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
   //var xml = fs.readFileSync(__dirname + '/dup-us-en.xml', 'utf8');
   request('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml?nc='+ moment().unix() , function (error, response, xml) {
     if (!error && response.statusCode == 200) {
-      //console.log('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml?nc='+ moment().unix());
+      console.log('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml?nc='+ moment().unix());
       //fs.writeFile('xml.xml', xml);
       parser.parseString(xml, function(err, result) {
+        global.AEMXMLSERVED = result.records['$']['timestamp'];
         var records = result.records.record;
         records = records.filter(function(item) {
           if (item['content-type'] == "Article" ||
@@ -335,7 +336,7 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
         // ARRAY IS NOW READY!!
         global.masterXml = processedRecords;
         global.lastUpdated = new Date();
-        console.log('FEED UPDATED:',global.lastUpdated);
+        console.log('FEED UPDATED:',global.lastUpdated,global.AEMXMLSERVED);
         processAndSendResponse(choosenFeed,numberOfDays,req,res);
       });
     }
@@ -417,7 +418,7 @@ var processAndSendResponse = function(choosenFeed,numberOfDays,req,res){
     //Create a feed...
     var feedoptions = {
         title: `Deloitte University Press: ${choosenFeedTitle}`,
-        description: `Showing latest content for: ${choosenFeedTitle}`,
+        description: `Showing latest content for: ${choosenFeedTitle} from AEM XML Dated: ${global.AEMXMLSERVED}`,
         feed_url: `http://dup-rss-feeds.herokuapp.com/${choosenFeed}/7/rss.xml`,
         site_url: 'https://dupress.deloitte.com',
         copyright: 'Copyright © 2016 Deloitte Development LLC. All rights reserved.',
