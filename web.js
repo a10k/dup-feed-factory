@@ -280,9 +280,9 @@ var listedSubs = {
 
 var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,res) {
   //var xml = fs.readFileSync(__dirname + '/dup-us-en.xml', 'utf8');
-  request('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml?nc='+ moment().unix() , function (error, response, xml) {
+  request('https://www2.deloitte.com/content/dam/insights/us/snp/us_en.xml?nc='+ moment().unix() , function (error, response, xml) {
     if (!error && response.statusCode == 200) {
-      console.log('https://dupress.deloitte.com/content/dam/dup-us-en/snp/dup-us-en.xml?nc='+ moment().unix());
+      console.log('https://www2.deloitte.com/content/dam/insights/us/snp/us_en.xml?nc='+ moment().unix());
       //fs.writeFile('xml.xml', xml);
       parser.parseString(xml, function(err, result) {
         global.AEMXMLSERVED = result.records['$']['timestamp'];
@@ -318,7 +318,7 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
           var data = {
             'title' : prefixedTitle,
             'subTitle': item['sub-title'] && item['sub-title'][0],
-            'url': item['url'] && item['url'][0] && item['url'][0].replace('/content/dupress','https://dupress.deloitte.com'),
+            'url': item['url'] && item['url'][0] && item['url'][0].replace('/content/insights','https://www2.deloitte.com/insights'),
             'description': item['desc'] && item['desc'][0],
             'guid': item['pageID'] && item['pageID'][0],
             'categories': item['cq-tag-name'] && item['cq-tag-name'][0] && item['cq-tag-name'][0].replace(/_us;en/g,'').split('|'),
@@ -327,7 +327,7 @@ var readXMLFile = function(processAndSendResponse,choosenFeed,numberOfDays,req,r
              custom_elements: [
                   {'type': item['content-type'] && item['content-type'][0]},
                   {'cta': item['cta'] && item['cta'][0]},
-                  {'thumbnail':item['thumbnail'] && item['thumbnail'][0] && ('https://dupress.deloitte.com' + item['thumbnail'][0]+'/jcr:content/renditions/cq5dam.web.120.120.jpeg')}
+                  {'thumbnail':item['thumbnail'] && item['thumbnail'][0] && ('https://www2.deloitte.com' + item['thumbnail'][0]+'/jcr:content/renditions/cq5dam.web.120.120.jpeg')}
                 ]
             };
           processedRecords.push(data);
@@ -417,20 +417,20 @@ var processAndSendResponse = function(choosenFeed,numberOfDays,req,res){
 
     //Create a feed...
     var feedoptions = {
-        title: `Deloitte University Press: ${choosenFeedTitle}`,
+        title: `Deloitte Insights: ${choosenFeedTitle}`,
         description: `Showing latest content for: ${choosenFeedTitle} from AEM XML Dated: ${global.AEMXMLSERVED}`,
         feed_url: `http://dup-rss-feeds.herokuapp.com/${choosenFeed}/7/rss.xml`,
-        site_url: 'https://dupress.deloitte.com',
-        copyright: 'Copyright © 2016 Deloitte Development LLC. All rights reserved.',
+        site_url: 'https://www2.deloitte.com/insights',
+        copyright: 'Copyright © 2018 Deloitte Development LLC. All rights reserved.',
         language: 'en-us',
-        generator:'DUP RSS FEED',
+        generator:'DI RSS FEED',
         categories: listedSubs[choosenFeedTitle],
     };
     var feed = new RSS(feedoptions);
     ex.map(function(item){
       var varUrl = item.url;
       varUrl = varUrl.replace(/(\?id=.*$)/,'');
-      varUrl = varUrl + '?id=us:2em:3pa:' + choosenFeed + ':eng:dup:' + moment().format('MMDDYY');
+      varUrl = varUrl + '?id=us:2em:3pa:' + choosenFeed + ':eng:di:' + moment().format('MMDDYY');
       item.url = varUrl;
       feed.item(item)
     })
